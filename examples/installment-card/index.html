@@ -1,0 +1,995 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Installment Card — side-by-side</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  @font-face {
+    font-family: 'AT&T Aleck Sans';
+    src: url('fonts/ATTAleckSans_Rg.ttf') format('truetype');
+    font-weight: 400; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: 'AT&T Aleck Sans';
+    src: url('fonts/ATTAleckSans_Md.ttf') format('truetype');
+    font-weight: 500; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: 'AT&T Aleck Sans';
+    src: url('fonts/ATTAleckSans_Bd.ttf') format('truetype');
+    font-weight: 700; font-style: normal; font-display: swap;
+  }
+
+  :root {
+    --card: #ffffff;
+    --ink: #0f1420;
+    --ink-muted: #5b6476;
+    --rule-soft: #eef2f7;
+    --stage-blue: #D6ECFB;
+
+    /* Reduced palette (default for this comparison view): one hue + texture. */
+    --paid: #00388F;            /* AT&T Sapphire — solid paid hue */
+    --togo: #7FCEEF;            /* lighter AT&T Blue — "to go" / "remaining" outline */
+    --waived: #1FA2E1;          /* AT&T Blue — text-weight on the WAIVED caption + hatch */
+    --zone-tint: rgba(31, 162, 225, 0.10);
+    --hatch-line: #1FA2E1;
+    --hatch-bg: rgba(31, 162, 225, 0.10);
+
+    /* CTA — same sapphire as the data hue (Signal pillar: same family). */
+    --cta: #00388F;
+    --cta-hover: #002A6B;
+    --accent-strong: #00388F;
+    --accent-tint: rgba(0, 56, 143, 0.10);
+
+    /* Status (checklist chips). */
+    --status-ready: #5E9400;
+    --status-ready-bg: #f0f8d6;          /* approximates color-mix(#91DC00 18%, white) */
+    --status-future: #4A5362;
+    --status-future-bg: #eef1f5;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--stage-blue);
+    font-family: 'AT&T Aleck Sans', -apple-system, system-ui, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .font-mono { font-family: 'Geist Mono', ui-monospace, monospace; }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+
+  /* ---------- Stage ---------- */
+
+  .stage {
+    background: var(--stage-blue);
+    padding: 32px 40px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .stage-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+
+  .stage-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .stage-tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .column-label {
+    margin-bottom: 12px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .state-label {
+    margin: 24px 0 10px;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-family: 'Geist Mono', ui-monospace, monospace;
+  }
+  .state-label:first-child { margin-top: 0; }
+
+  /* ---------- Card shell ---------- */
+
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.16);
+    padding: 16px;
+    width: 100%;
+    max-width: 390px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .card-device {
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+  }
+
+  .pill-nua {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 4px 10px 4px 8px;
+    border-radius: 999px;
+    background: var(--accent-tint);
+    color: var(--accent-strong);
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .pill-nua sup {
+    font-size: 7px;
+    font-weight: 700;
+    margin-left: 1px;
+  }
+
+  .tag-installment {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: var(--rule-soft);
+    color: var(--ink-muted);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+  }
+
+  /* ---------- Outcome title ---------- */
+
+  .outcome {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  .outcome-lead { color: var(--ink); }
+  .outcome-count { color: var(--accent-strong); font-weight: 800; }
+
+  /* ---------- Track (Next Up — captions variant) ---------- */
+
+  .track-wrap { padding-top: 8px; }
+
+  .track-bar {
+    width: 100%;
+    height: 12px;
+    display: block;
+    overflow: visible;
+  }
+
+  .captions {
+    position: relative;
+    height: 22px;
+    margin-top: 8px;
+  }
+
+  .caption {
+    position: absolute;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .caption-paid    { left: 0;       color: var(--paid); }
+  .caption-upgrade { left: 33.333%; color: var(--accent-strong); font-weight: 700; }
+  .caption-waived  { right: 0;      color: var(--waived); }
+
+  /* ---------- Grid (Installment Plan) ---------- */
+
+  .grid-track {
+    padding-top: 8px;
+    display: grid;
+    grid-template-columns: repeat(8, 24px);
+    grid-auto-rows: 24px;
+    justify-content: space-between;
+    row-gap: 6px;
+  }
+
+  .cell-paid {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--paid);
+    border: 1px solid var(--paid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+  }
+
+  .cell-upcoming {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: transparent;
+    border: 1.25px solid var(--paid);
+  }
+
+  .cell-owned {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--paid);
+  }
+
+  .legend {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 18px;
+    font-size: 12px;
+  }
+
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .legend-item.muted { color: var(--ink-muted); }
+
+  .legend-swatch-paid {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--paid);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+  }
+
+  .legend-swatch-upcoming {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1.25px solid var(--paid);
+    display: inline-block;
+  }
+
+  /* ---------- Breakdown (expanded state) ---------- */
+
+  .breakdown {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule-soft);
+  }
+
+  .breakdown-heading {
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .ledger-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .ledger-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    background: var(--zone-tint);
+    font-family: 'Geist Mono', ui-monospace, monospace;
+  }
+
+  .ledger-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ledger-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+
+  .dot-paid    { background: var(--paid); }
+  .dot-togo    { background: transparent; border: 1.5px solid var(--togo); }
+  .dot-waived  { background: transparent; }
+
+  .ledger-label {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .ledger-formula {
+    text-align: right;
+    padding-right: 8px;
+    color: var(--ink-muted);
+  }
+
+  .ledger-amount {
+    font-weight: 600;
+    text-align: right;
+    min-width: 70px;
+    color: var(--ink);
+  }
+
+  .monthly {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-top: 12px;
+    padding-bottom: 16px;
+    font-size: 12px;
+    border-top: 1px solid var(--rule-soft);
+    font-family: 'Geist Mono', ui-monospace, monospace;
+  }
+
+  .monthly-label { color: var(--ink-muted); }
+
+  .monthly-right {
+    display: flex;
+    align-items: baseline;
+  }
+
+  .monthly-detail {
+    color: var(--ink-muted);
+    margin-right: 8px;
+  }
+
+  .monthly-total {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    font-family: 'AT&T Aleck Sans', -apple-system, system-ui, sans-serif;
+  }
+
+  .checklist {
+    padding-top: 12px;
+    border-top: 1px solid var(--rule-soft);
+  }
+
+  .checklist-caption {
+    margin-bottom: 8px;
+    font-size: 10.5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-muted);
+    font-family: 'Geist Mono', ui-monospace, monospace;
+  }
+
+  .check-item {
+    display: grid;
+    grid-template-columns: 22px 1fr auto;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  .check-item:last-child { border-bottom: none; }
+
+  .check-icon-wrap { margin-top: 2px; }
+
+  .check-icon-ready {
+    display: flex;
+    height: 18px;
+    width: 18px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--status-ready);
+    color: #fff;
+  }
+
+  .check-icon-future {
+    height: 18px;
+    width: 18px;
+    border-radius: 50%;
+    border: 1.5px dashed var(--status-future);
+  }
+
+  .check-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .check-desc {
+    font-size: 12px;
+    line-height: 1.35;
+    margin-top: 2px;
+    color: var(--ink-muted);
+  }
+
+  .check-chip {
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .chip-ready  { color: var(--status-ready);  background: var(--status-ready-bg); }
+  .chip-future { color: var(--status-future); background: var(--status-future-bg); }
+
+  /* ---------- Footer + CTA ---------- */
+
+  .card-footer {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule-soft);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+  }
+
+  .footer-count { color: var(--ink); }
+  .footer-count .muted { color: var(--ink-muted); }
+
+  .footer-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--cta);
+    font-weight: 500;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+    font-size: 14px;
+  }
+
+  .cta {
+    margin-top: 16px;
+    width: 100%;
+    border-radius: 999px;
+    padding: 14px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--cta);
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s ease;
+  }
+  .cta:hover { background: var(--cta-hover); }
+
+  /* ---------- Responsive ---------- */
+
+  @media (max-width: 880px) {
+    .stage { padding: 24px 20px 32px; }
+    .columns { grid-template-columns: 1fr; gap: 24px; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="stage-header">
+      <div class="stage-title">Device installments</div>
+      <div class="stage-tag">Side-by-side</div>
+    </div>
+
+    <div class="columns">
+      <!-- ============================================================ -->
+      <!-- LEFT COLUMN: With Next Up Anytime                             -->
+      <!-- ============================================================ -->
+      <section>
+        <div class="column-label">With Next Up Anytime</div>
+
+        <div class="state-label">Default</div>
+
+        <!-- ---------- NUA — collapsed ---------- -->
+        <div class="card" aria-label="Installment card with Next Up Anytime, default state">
+          <div class="card-header">
+            <span class="card-device">iPhone 16 Pro MAX</span>
+            <span class="pill-nua">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+                <path d="M21 3v5h-5" />
+                <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+                <path d="M3 21v-5h5" />
+              </svg>
+              <span>Next Up Anytime<sup>SM</sup></span>
+            </span>
+          </div>
+
+          <div class="outcome">
+            <div class="outcome-lead">Upgrade</div>
+            <div class="outcome-count">available now</div>
+          </div>
+
+          <div class="track-wrap">
+            <svg class="track-bar" viewBox="0 0 320 12" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <pattern id="hatch-nua-collapsed" patternUnits="userSpaceOnUse"
+                         width="6" height="6" patternTransform="rotate(45)">
+                  <rect width="6" height="6" fill="var(--hatch-bg)" />
+                  <line x1="0" y1="0" x2="0" y2="6" stroke="var(--hatch-line)" stroke-width="3" />
+                </pattern>
+              </defs>
+              <rect x="108.667" y="0" width="211.333" height="12" rx="6" fill="url(#hatch-nua-collapsed)" />
+              <rect x="0" y="0" width="106.667" height="12" rx="6" fill="var(--paid)" />
+            </svg>
+
+            <div class="captions">
+              <span class="caption caption-paid">Paid</span>
+              <span class="caption caption-upgrade">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+                  <path d="M21 3v5h-5" />
+                  <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+                  <path d="M3 21v-5h5" />
+                </svg>
+                Upgrade
+              </span>
+              <span class="caption caption-waived">Waived</span>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div class="footer-count">
+              <span class="tabular-nums">8</span>
+              <span class="muted">of 24 paid</span>
+            </div>
+            <button class="footer-link" type="button">
+              View breakdown
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+          </div>
+
+          <button class="cta" type="button">Pay next installment</button>
+        </div>
+
+        <div class="state-label">Expanded</div>
+
+        <!-- ---------- NUA — expanded ---------- -->
+        <div class="card" aria-label="Installment card with Next Up Anytime, expanded state">
+          <div class="card-header">
+            <span class="card-device">iPhone 16 Pro MAX</span>
+            <span class="pill-nua">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+                <path d="M21 3v5h-5" />
+                <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+                <path d="M3 21v-5h5" />
+              </svg>
+              <span>Next Up Anytime<sup>SM</sup></span>
+            </span>
+          </div>
+
+          <div class="outcome">
+            <div class="outcome-lead">Upgrade</div>
+            <div class="outcome-count">available now</div>
+          </div>
+
+          <div class="track-wrap">
+            <svg class="track-bar" viewBox="0 0 320 12" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <pattern id="hatch-nua-expanded" patternUnits="userSpaceOnUse"
+                         width="6" height="6" patternTransform="rotate(45)">
+                  <rect width="6" height="6" fill="var(--hatch-bg)" />
+                  <line x1="0" y1="0" x2="0" y2="6" stroke="var(--hatch-line)" stroke-width="3" />
+                </pattern>
+              </defs>
+              <rect x="108.667" y="0" width="211.333" height="12" rx="6" fill="url(#hatch-nua-expanded)" />
+              <rect x="0" y="0" width="106.667" height="12" rx="6" fill="var(--paid)" />
+            </svg>
+
+            <div class="captions">
+              <span class="caption caption-paid">Paid</span>
+              <span class="caption caption-upgrade">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+                  <path d="M21 3v5h-5" />
+                  <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+                  <path d="M3 21v-5h5" />
+                </svg>
+                Upgrade
+              </span>
+              <span class="caption caption-waived">Waived</span>
+            </div>
+          </div>
+
+          <div class="breakdown">
+            <div class="breakdown-heading">Breakdown</div>
+
+            <div class="ledger-rows">
+              <!-- Paid: 8 × $33.33 = $266.64 -->
+              <div class="ledger-row">
+                <div class="ledger-left">
+                  <span class="ledger-dot dot-paid"></span>
+                  <span class="ledger-label">Paid</span>
+                </div>
+                <div class="ledger-formula tabular-nums">8 × $33.33</div>
+                <div class="ledger-amount tabular-nums">$266.64</div>
+              </div>
+              <!-- "To go" hidden because paid (8) === MILESTONE_PAYMENTS (8) -->
+              <!-- Waived: 16 × $33.33 = $533.28 -->
+              <div class="ledger-row">
+                <div class="ledger-left">
+                  <span class="ledger-dot dot-waived" aria-hidden="true">
+                    <svg width="8" height="8" viewBox="0 0 8 8" style="display:block">
+                      <defs>
+                        <pattern id="ldghatch-nua-waived" patternUnits="userSpaceOnUse"
+                                 width="3" height="3" patternTransform="rotate(45)">
+                          <line x1="0" y1="0" x2="0" y2="3" stroke="var(--waived)" stroke-width="1.5" />
+                        </pattern>
+                      </defs>
+                      <circle cx="4" cy="4" r="4" fill="url(#ldghatch-nua-waived)" />
+                      <circle cx="4" cy="4" r="3.25" fill="none" stroke="var(--waived)" stroke-width="1" />
+                    </svg>
+                  </span>
+                  <span class="ledger-label">Waived</span>
+                </div>
+                <div class="ledger-formula tabular-nums">16 × $33.33</div>
+                <div class="ledger-amount tabular-nums">$533.28</div>
+              </div>
+            </div>
+
+            <div class="monthly">
+              <span class="monthly-label">Monthly</span>
+              <div class="monthly-right">
+                <span class="monthly-detail tabular-nums">$33.33 device + $10.00 fee =</span>
+                <span class="monthly-total tabular-nums">$43.33</span>
+              </div>
+            </div>
+
+            <div class="checklist">
+              <div class="checklist-caption">Before upgrade, you&rsquo;ll need</div>
+              <div>
+                <!-- 33% paid: status = ready (paid >= MILESTONE_PAYMENTS) -->
+                <div class="check-item">
+                  <div class="check-icon-wrap">
+                    <div class="check-icon-ready">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                           stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="check-label">33% paid toward device</div>
+                    <div class="check-desc">8 of 8 payments complete.</div>
+                  </div>
+                  <div class="check-chip chip-ready">Ready</div>
+                </div>
+                <!-- Trade-in condition: status = future -->
+                <div class="check-item">
+                  <div class="check-icon-wrap">
+                    <div class="check-icon-future" aria-hidden="true"></div>
+                  </div>
+                  <div>
+                    <div class="check-label">Phone in trade-in condition</div>
+                    <div class="check-desc">Powers on · no liquid damage · no cracked screen.</div>
+                  </div>
+                  <div class="check-chip chip-future">At upgrade</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div class="footer-count">
+              <span class="tabular-nums">8</span>
+              <span class="muted">of 24 paid</span>
+            </div>
+            <button class="footer-link" type="button">
+              Hide breakdown
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                   style="transform: rotate(180deg)" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+          </div>
+
+          <button class="cta" type="button">Pay next installment</button>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- RIGHT COLUMN: Without add-on (Installment Plan)               -->
+      <!-- ============================================================ -->
+      <section>
+        <div class="column-label">Without add-on</div>
+
+        <div class="state-label">Default</div>
+
+        <!-- ---------- Installment Plan — collapsed ---------- -->
+        <div class="card" aria-label="Installment card without add-on, default state">
+          <div class="card-header">
+            <span class="card-device">iPhone 16 Pro MAX</span>
+            <span class="tag-installment">Installment Plan</span>
+          </div>
+
+          <div class="outcome">
+            <div class="outcome-lead">Paying off</div>
+            <div class="outcome-count">8 of 24 payments in</div>
+          </div>
+
+          <div class="grid-track" role="list" aria-label="Payment progress">
+            <div class="cell-paid" role="listitem"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="cell-paid" role="listitem"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="cell-paid" role="listitem"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="cell-paid" role="listitem"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="cell-paid" role="listitem"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="cell-paid" role="listitem"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="cell-paid" role="listitem"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="cell-paid" role="listitem"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-owned" role="listitem">
+              <svg viewBox="0 0 16 22" width="60%" height="85%" fill="none" stroke="currentColor"
+                   stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="1.25" y="1.25" width="13.5" height="19.5" rx="2"/>
+                <line x1="5" y1="4.5" x2="11" y2="4.5" stroke-width="1.6"/>
+                <path d="M8 9 V16 M10.25 10.5 H7 a1.5 1.5 0 0 0 0 3 H9 a1.5 1.5 0 0 1 0 3 H5.75"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="legend">
+            <span class="legend-item">
+              <span class="legend-swatch-paid">
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5"/>
+                </svg>
+              </span>
+              Paid · 8
+            </span>
+            <span class="legend-item muted">
+              <span class="legend-swatch-upcoming"></span>
+              Upcoming · 16
+            </span>
+            <span class="legend-item muted">
+              <svg viewBox="0 0 16 22" width="11" height="14" fill="none" stroke="var(--paid)"
+                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="1.25" y="1.25" width="13.5" height="19.5" rx="2"/>
+                <line x1="5" y1="4.5" x2="11" y2="4.5" stroke-width="1.8"/>
+                <path d="M8 9 V16 M10.25 10.5 H7 a1.5 1.5 0 0 0 0 3 H9 a1.5 1.5 0 0 1 0 3 H5.75"/>
+              </svg>
+              Owned outright
+            </span>
+          </div>
+
+          <div class="card-footer">
+            <div class="footer-count">
+              <span class="tabular-nums">8</span>
+              <span class="muted">of 24 paid</span>
+            </div>
+            <button class="footer-link" type="button">
+              View breakdown
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </button>
+          </div>
+
+          <button class="cta" type="button">Pay next installment</button>
+        </div>
+
+        <div class="state-label">Expanded</div>
+
+        <!-- ---------- Installment Plan — expanded ---------- -->
+        <div class="card" aria-label="Installment card without add-on, expanded state">
+          <div class="card-header">
+            <span class="card-device">iPhone 16 Pro MAX</span>
+            <span class="tag-installment">Installment Plan</span>
+          </div>
+
+          <div class="outcome">
+            <div class="outcome-lead">Paying off</div>
+            <div class="outcome-count">8 of 24 payments in</div>
+          </div>
+
+          <div class="grid-track" role="list" aria-label="Payment progress">
+            <div class="cell-paid" role="listitem"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="cell-paid" role="listitem"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="cell-paid" role="listitem"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="cell-paid" role="listitem"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="cell-paid" role="listitem"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="cell-paid" role="listitem"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="cell-paid" role="listitem"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="cell-paid" role="listitem"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-upcoming" role="listitem"></div>
+            <div class="cell-owned" role="listitem">
+              <svg viewBox="0 0 16 22" width="60%" height="85%" fill="none" stroke="currentColor"
+                   stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="1.25" y="1.25" width="13.5" height="19.5" rx="2"/>
+                <line x1="5" y1="4.5" x2="11" y2="4.5" stroke-width="1.6"/>
+                <path d="M8 9 V16 M10.25 10.5 H7 a1.5 1.5 0 0 0 0 3 H9 a1.5 1.5 0 0 1 0 3 H5.75"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="legend">
+            <span class="legend-item">
+              <span class="legend-swatch-paid">
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5"/>
+                </svg>
+              </span>
+              Paid · 8
+            </span>
+            <span class="legend-item muted">
+              <span class="legend-swatch-upcoming"></span>
+              Upcoming · 16
+            </span>
+            <span class="legend-item muted">
+              <svg viewBox="0 0 16 22" width="11" height="14" fill="none" stroke="var(--paid)"
+                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="1.25" y="1.25" width="13.5" height="19.5" rx="2"/>
+                <line x1="5" y1="4.5" x2="11" y2="4.5" stroke-width="1.8"/>
+                <path d="M8 9 V16 M10.25 10.5 H7 a1.5 1.5 0 0 0 0 3 H9 a1.5 1.5 0 0 1 0 3 H5.75"/>
+              </svg>
+              Owned outright
+            </span>
+          </div>
+
+          <div class="breakdown">
+            <div class="breakdown-heading">Breakdown</div>
+
+            <div class="ledger-rows">
+              <!-- Paid: 8 × $33.33 = $266.64 -->
+              <div class="ledger-row">
+                <div class="ledger-left">
+                  <span class="ledger-dot dot-paid"></span>
+                  <span class="ledger-label">Paid</span>
+                </div>
+                <div class="ledger-formula tabular-nums">8 × $33.33</div>
+                <div class="ledger-amount tabular-nums">$266.64</div>
+              </div>
+              <!-- Remaining: 16 × $33.33 = $533.28 (zone="togo" → ring dot in reduced) -->
+              <div class="ledger-row">
+                <div class="ledger-left">
+                  <span class="ledger-dot dot-togo"></span>
+                  <span class="ledger-label">Remaining</span>
+                </div>
+                <div class="ledger-formula tabular-nums">16 × $33.33</div>
+                <div class="ledger-amount tabular-nums">$533.28</div>
+              </div>
+            </div>
+
+            <div class="monthly">
+              <span class="monthly-label">Monthly</span>
+              <div class="monthly-right">
+                <span class="monthly-detail tabular-nums">24 × $33.33 =</span>
+                <span class="monthly-total tabular-nums">$33.33</span>
+              </div>
+            </div>
+            <!-- Promo block hidden because paid (8) === MILESTONE_PAYMENTS (8);
+                 source only shows it while paid < MILESTONE_PAYMENTS. -->
+          </div>
+
+          <div class="card-footer">
+            <div class="footer-count">
+              <span class="tabular-nums">8</span>
+              <span class="muted">of 24 paid</span>
+            </div>
+            <button class="footer-link" type="button">
+              Hide breakdown
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                   style="transform: rotate(180deg)" aria-hidden="true">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </button>
+          </div>
+
+          <button class="cta" type="button">Pay next installment</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+</html>
