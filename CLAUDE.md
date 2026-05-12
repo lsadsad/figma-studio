@@ -219,3 +219,80 @@ Before any release, read `.notes/RELEASING.md` and follow all five phases. Run `
 - Tool registration: `registerXxxTools(server, getFigmaAPI, ...)` pattern in `src/tools/`
 - Desktop Bridge: WebSocket (`src/core/websocket-server.ts`) with CDP fallback
 - Schema compatibility: No `z.any()` — Gemini requires strictly typed Zod schemas
+
+## finePrint — Issue Tracking (`.issues/`)
+
+Issues are plain markdown files with YAML frontmatter, tracked in git. No external tools needed.
+
+```
+.issues/
+  open/       # active issues
+  closed/     # completed issues
+```
+
+### Frontmatter schema
+
+```yaml
+---
+id: abc              # short mnemonic ID (3 chars; 4 for epics)
+alias: my-feature    # optional readable name for conversational use
+category: feature    # feature area (project-specific)
+title: "..."
+type: task|feature|bug|epic
+priority: 1          # 0=critical, 1=high, 2=medium, 3=low, 4=backlog
+status: open
+depends_on: []       # list of IDs this issue is blocked by
+created: 2026-03-28
+---
+```
+
+### Conventions
+
+- File naming: `P{priority}-{category}-{id}-{slug}.md` (e.g., `P2-feature-abc-my-feature.md`)
+- To close an issue: `git mv .issues/open/P2-feature-abc-*.md .issues/closed/`
+- To find ready work: issues in `open/` with empty `depends_on` or all deps in `closed/`
+- Dependencies reference other issue IDs (check `depends_on` arrays)
+- IDs must be globally unique within the project
+- Obsidian-compatible: open `.issues/` as a vault, use Dataview for queries
+
+### Trigger phrases
+
+| Shortcut | Natural language | Action |
+|---|---|---|
+| `/issues` | "what's open" | List all open issues |
+| `/ready` | "what's ready", "what should I work on" | Show unblocked issues only |
+| `/issue X` | "show issue X" | Read a specific issue |
+| `/track X` | "create an issue for X", "track this" | Write new `.issues/open/P{n}-{category}-{id}-{slug}.md` |
+| `/close X` | "close X", "mark X done" | `git mv .issues/open/... .issues/closed/` |
+
+## finePrint — Project Memory (`.memory/`)
+
+Append-only knowledge base for decisions, context, and open questions.
+
+### Format
+
+Files are named `YYYY-MM-DD-slug.md` and contain free-form markdown. Content should be self-contained and dateable.
+
+### Trigger phrases
+
+| Shortcut | Natural language | Action |
+|---|---|---|
+| `/memory` | "check memory" | List all memory entries |
+| `/recall X` | "what do we know about X" | Grep `.memory/` for topic |
+| `/remember` | "remember this", "save to memory" | Write new `.memory/YYYY-MM-DD-slug.md` |
+| `/supersede X` | "this replaces the decision on X" | New entry with "Supersedes:" reference |
+
+## Session Completion
+
+**When ending a work session**, you MUST complete ALL steps below.
+
+1. **File issues** for remaining work (create new `.issues/open/*.md` files)
+2. **Run quality gates** (if code changed) — tests, linters, builds
+3. **Update issue status** — move completed issues to `closed/`
+4. **PUSH TO REMOTE**:
+   ```bash
+   git pull --rebase
+   git push
+   git status  # MUST show "up to date with origin"
+   ```
+5. **Verify** — all changes committed AND pushed
